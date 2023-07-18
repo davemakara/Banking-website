@@ -101,6 +101,7 @@ nav.addEventListener('mouseover', handleHover.bind(0.5));
 nav.addEventListener('mouseout', handleHover.bind(1));
 
 const initialCoords = section1.getBoundingClientRect();
+const allSections = document.querySelectorAll('.section');
 
 window.addEventListener('scroll', function () {
   // console.log(window.scrollY);
@@ -109,87 +110,65 @@ window.addEventListener('scroll', function () {
   else nav.classList.remove('sticky');
 });
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const revealSection = function (entries, observer) {
+  const [entry] = entries;
+  console.log(entry);
 
-// console.log(document.documentElement);
+  if (!entry.isIntersecting) return;
+  entry.target.classList.remove('section--hidden');
+  observer.unobserve(entry.target);
+};
 
-// const header = document.querySelector('.header');
-// const allSelection = document.querySelectorAll('.section');
-// console.log(allSelection);
+const sectionObserver = new IntersectionObserver(revealSection, {
+  root: null,
+  threshold: 0.15,
+});
 
-// document.getElementById('section--1');
-// const allButtons = document.getElementsByTagName('button');
-// console.log(allButtons);
+allSections.forEach(el => {
+  sectionObserver.observe(el);
+  el.classList.add('section--hidden');
+});
 
-// const allClasses = document.getElementsByClassName('btn');
-// console.log(allClasses);
+const slides = document.querySelectorAll('.slide');
+const btnLeft = document.querySelector('.slider__btn--left');
+const btnRight = document.querySelector('.slider__btn--right');
 
-// const message = document.createElement('div');
-// message.classList.add('cookie-message');
-// message.innerHTML =
-//   'We use cookies for improved functionality and analytics. <button class="btn btn--close-cookie">Got it!</button>';
-// header.append(message);
+let curSlide = 0;
+let maxSlide = slides.length;
 
-// document.querySelector('.btn--close-cookie').addEventListener('click', () => {
-//   message.remove();
-// });
+const goToSlide = el => {
+  slides.forEach(
+    (s, i) => (s.style.transform = `translateX(${100 * (i - curSlide)}%)`)
+  );
+};
 
-// // STYLES
+goToSlide(0);
 
-// message.style.backgroundColor = '#37383d';
-// message.style.width = '100%';
+const nextSlide = () => {
+  if (curSlide === maxSlide - 1) {
+    curSlide = 0;
+  } else {
+    curSlide++;
+  }
 
-// console.log(message.style.backgroundColor);
+  goToSlide(curSlide);
+};
 
-// console.log(getComputedStyle(message).height);
+const prevSlide = () => {
+  if (curSlide === 0) {
+    curSlide = maxSlide - 1;
+  } else {
+    curSlide--;
+  }
 
-// document.documentElement.style.setProperty('--color-primary', 'orangered');
+  goToSlide(curSlide);
+};
 
-// // ATTRIBUTES
+btnRight.addEventListener('click', nextSlide);
+btnLeft.addEventListener('click', prevSlide);
 
-// const logo = document.querySelector('.nav__logo');
-// console.log(logo.alt);
-// console.log(logo.src);
-
-// logo.alt = 'Beautiful minimalist logo';
-
-// logo.classList.add('c');
-// logo.classList.remove('c');
-// logo.classList.toggle('c');
-// logo.classList.contains('c');
-
-// let h1 = document.querySelector('h1');
-// let alertH1 = e => {
-//   alert('addEventListener: great!');
-// };
-
-// h1.addEventListener('mouseenter', alertH1);
-
-// setTimeout(() => {
-//   h1.removeEventListener('mouseenter', alertH1);
-// }, 2000);
-
-// let randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
-// let randomColor = () =>
-//   `rgb(${randomInt(0, 255)}, ${randomInt(0, 255)}, ${randomInt(0, 255)})`;
-
-// console.log(randomColor(0, 255));
-
-// document.querySelector('.nav__link').addEventListener('click', function (e) {
-//   this.style.backgroundColor = randomColor();
-//   console.log('LINK', e.target);
-// });
-
-// document.querySelector('.nav__links').addEventListener('click', function (e) {
-//   this.style.backgroundColor = randomColor();
-// });
-
-// document.querySelector('.nav').addEventListener('click', function (e) {
-//   this.style.backgroundColor = randomColor();
-// });
-
-// const h1 = document.querySelector('h1');
-
-// console.log(h1.querySelectorAll('.highlight'));
-
-// console.log(h1.children);
+document.addEventListener('keydown', function (e) {
+  console.log(e);
+  if (e.key === 'ArrowLeft') prevSlide();
+  e.key === 'ArrowRight' && nextSlide();
+});
